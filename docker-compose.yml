@@ -2,11 +2,13 @@ version: "3.3"
 
 services:
   traefik:
-    image: "traefik:v2.1.1"
+    image: "traefik:v2.1.2"
     ports:
       - "80:80"
       - "443:443"
       # - "8080:8080"
+    networks:
+      - web
     volumes:
       - ${PWD}/traefik.yml:/etc/traefik/traefik.yml:ro # Traefik static config
       - ${PWD}/traefik-config.yml:/etc/traefik/traefik-config.yml:ro # Traefik dynamic config
@@ -15,6 +17,8 @@ services:
 
   my-app:
     image: containous/whoami:v1.4.0
+    networks:
+      - web
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.my-app.entrypoints=websecure"
@@ -24,6 +28,8 @@ services:
 
   my-app2:
     image: mendhak/http-https-echo
+    networks:
+      - web
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.my-app2.entrypoints=websecure"
@@ -32,3 +38,7 @@ services:
       - "traefik.http.routers.my-app2.tls.certresolver=leresolver"
       - "traefik.http.middlewares.test-stripprefix.stripprefix.prefixes=/test2" 
       - "traefik.http.routers.my-app2.middlewares=test-stripprefix@docker" 
+
+networks:
+  web:
+    external: true
