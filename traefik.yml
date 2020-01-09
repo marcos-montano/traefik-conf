@@ -1,0 +1,31 @@
+entryPoints:
+  web:
+    address: ":80"
+  websecure:
+    address: ":443"
+
+# Docker configuration backend
+providers:
+  docker:
+    defaultRule: "Host(`{{ trimPrefix `/` .Name }}.test.mithurlug.com`)"
+    exposedByDefault: false
+  file:
+    filename: "/etc/traefik/traefik-config.yml"
+    watch: true
+
+# API and dashboard configuration
+api:
+  # insecure: true
+  dashboard: true
+  debug: true
+
+log:
+  level: ERROR #DEBUG, INFO, WARN, ERROR, FATAL, PANIC
+
+certificatesResolvers:
+  leresolver:
+    acme:
+      email: "admin@test.mithurlug.com"
+      # caserver: "https://acme-staging-v02.api.letsencrypt.org/directory"
+      storage: "/letsencrypt/acme.json"
+      tlsChallenge: {}

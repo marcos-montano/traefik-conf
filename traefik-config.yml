@@ -1,0 +1,35 @@
+# Dynamic Configuration
+http:
+  routers:
+    traefik:
+      entryPoints: 
+        - websecure
+      middlewares: 
+        - authtraefik
+      service: api@internal
+      # rule: Host(`traefik.test.mithurlug.com`)
+      rule: Host(`test.mithurlug.com`)
+      tls:
+        certResolver: leresolver
+    
+    # global redirect to https
+    http-catchall:
+      entryPoints: 
+        - web
+      middlewares: 
+        - redirect-to-https
+      service: api@internal
+      # rule: "Host(`{host:.+}`)"
+      rule: "hostregexp(`{host:.+}`)"
+  
+  middlewares:
+    authtraefik:
+      basicAuth:
+        # htpasswd -nb user password
+        users:
+          - "admin:$apr1$VzZMhM9U$PIaqr0viK8dcBnXfMGFh8."
+          - "user:$apr1$7FgGjv6a$mmVaIKonLl6TkiMAYlFDM."
+    
+    redirect-to-https:
+      redirectScheme:
+        scheme: https

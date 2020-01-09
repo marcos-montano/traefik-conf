@@ -1,0 +1,34 @@
+version: "3.3"
+
+services:
+  traefik:
+    image: "traefik:v2.1.1"
+    ports:
+      - "80:80"
+      - "443:443"
+      # - "8080:8080"
+    volumes:
+      - ${PWD}/traefik.yml:/etc/traefik/traefik.yml:ro # Traefik static config
+      - ${PWD}/traefik-config.yml:/etc/traefik/traefik-config.yml:ro # Traefik dynamic config
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./letsencrypt:/letsencrypt
+
+  my-app:
+    image: containous/whoami:v1.4.0
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.my-app.entrypoints=websecure"
+      - "traefik.http.routers.my-app.rule=Host(`whoami.test.mithurlug.com`)"
+      - "traefik.http.routers.my-app.tls=true"
+      - "traefik.http.routers.my-app.tls.certresolver=leresolver"
+
+  my-app2:
+    image: mendhak/http-https-echo
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.my-app2.entrypoints=websecure"
+      - "traefik.http.routers.my-app2.rule=(Host(`whoami.test.mithurlug.com`) && PathPrefix(`/test2`))" 
+      - "traefik.http.routers.my-app2.tls=true"
+      - "traefik.http.routers.my-app2.tls.certresolver=leresolver"
+      - "traefik.http.middlewares.test-stripprefix.stripprefix.prefixes=/test2" 
+      - "traefik.http.routers.my-app2.middlewares=test-stripprefix@docker" 
