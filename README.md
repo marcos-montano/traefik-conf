@@ -53,3 +53,29 @@ docker run -d \
 --network web \
 mendhak/http-https-echo
 ```
+
+### loadbalacer
+
+```
+docker run -d \
+--label "traefik.enable=true" \
+--label "traefik.http.routers.temp3.tls=true" \
+--label "traefik.http.routers.temp3.tls.certresolver=leresolver" \
+--label "traefik.http.routers.temp3.entrypoints=websecure" \
+--label "traefik.http.routers.temp3.rule=Host(\`tempx.test.mithurlug.com\`)" \
+--label "traefik.http.services.tempx.loadbalancer.server.port=80" \
+--name temp3 \
+--network web \
+containous/whoami
+
+docker run -d \
+--label "traefik.enable=true" \
+--label "traefik.http.routers.temp4.tls=true" \
+--label "traefik.http.routers.temp4.tls.certresolver=leresolver" \
+--label "traefik.http.routers.temp4.entrypoints=websecure" \
+--label "traefik.http.routers.temp4.rule=Host(\`tempx.test.mithurlug.com\`)" \
+--label "traefik.http.services.tempx.loadbalancer.server.port=80" \
+--name temp4 \
+--network web \
+containous/whoami
+```
